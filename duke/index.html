@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D2 Museum Gothic Reading Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Marcellus&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<canvas id="c" tabindex="0" aria-label="First-person view of the Gothic Reading Room museum"></canvas>
+
+<div id="hud" hidden>
+  <div id="counter" aria-live="polite"><span class="lbl">Discovered</span><b id="count">0 / 10</b><div id="pips"></div></div>
+  <div id="cross"></div>
+  <div id="prompt"><span id="promptMain"><kbd>E</kbd> Press E to Explore</span><small id="promptTheme"></small></div>
+  <div id="tutorial">
+    <span><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or arrow keys to walk, <kbd>Shift</kbd> to walk faster</span>
+    <span id="lookHint">Move the mouse to look around</span>
+    <span><kbd>E</kbd> to explore an artifact, <kbd>Esc</kbd> to pause, <kbd>M</kbd> to mute</span>
+  </div>
+  <div id="toast" role="status"></div>
+</div>
+
+<section id="start">
+  <div class="inner">
+    <div class="eyebrow">Duke and Duke Kunshan Presence Lab</div>
+    <h1>D2: The Half a Day Away Sessions</h1>
+    <div class="sub">Gothic Reading Room | Prototype 01</div>
+    <p>Walk through a reading room that has become a museum of shared memories. Ten artifacts are waiting somewhere among the tables and bookcases.</p>
+    <div class="row">
+      <button class="btn" id="enter">Enter Museum</button>
+      <span class="fine">Best with a keyboard and mouse on a desktop browser.</span>
+    </div>
+    <div class="controls">
+      <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / arrows</span><span>Walk</span>
+      <span><kbd>Mouse</kbd></span><span>Look around</span>
+      <span><kbd>E</kbd></span><span>Explore an artifact</span>
+      <span><kbd>Shift</kbd></span><span>Walk slightly faster</span>
+      <span><kbd>Esc</kbd></span><span>Release the mouse and pause</span>
+    </div>
+    <div class="fine">Most stories in this prototype are fictional placeholders, not real student submissions. Artifact 10 comes from a D2 team member’s own summer at DKU.</div>
+  </div>
+</section>
+
+<aside id="panel" aria-hidden="true" aria-labelledby="pTitle">
+  <header>
+    <div class="top">
+      <div class="eyebrow" id="pEyebrow"></div>
+      <button class="btn ghost small" id="pClose">Close <kbd>E</kbd></button>
+    </div>
+    <h2 id="pTitle"></h2>
+    <dl class="meta" id="pMeta"></dl>
+  </header>
+  <div id="pBody"></div>
+  <footer><span id="pNote">Prototype placeholder, fictional sample content</span><span id="pFoot"></span></footer>
+</aside>
+
+<div id="ride" hidden>
+  <div class="rtime"><span id="rTime">0.00</span><small>seconds · goal 8</small></div>
+  <div id="rDial" class="fine"></div>
+  <div id="rCount"></div>
+  <div class="rbal">
+    <div class="track"><b id="rMark"></b></div>
+    <div class="fine">Keep the marker in the middle: <kbd>A</kbd> / <kbd>&larr;</kbd> nudges it left, <kbd>D</kbd> / <kbd>&rarr;</kbd> nudges it right. <kbd>Esc</kbd> to climb off.</div>
+  </div>
+</div>
+
+<section id="rideMenu" class="modal" hidden aria-labelledby="rmTitle">
+  <div class="box">
+    <div class="eyebrow">Shooters II Saloon · Mechanical bull</div>
+    <h2 id="rmTitle">Ride the bull</h2>
+    <p class="fine" style="margin:0">The bull bucks, tilts and spins, and gets meaner every second. Keep your balance marker in the middle. Two point three seconds is the number to beat. Eight seconds makes you a legend.</p>
+    <div class="levels">
+      <button class="lvl" data-level="0"><div><b>Gentle</b><span>First time. The operator likes you.</span></div><em id="best0"></em></button>
+      <button class="lvl" data-level="1"><div><b>Saturday night</b><span>The usual setting.</span></div><em id="best1"></em></button>
+      <button class="lvl" data-level="2"><div><b>The operator has a grudge</b><span>He has a dial and he is not afraid to use it.</span></div><em id="best2"></em></button>
+    </div>
+    <div class="row"><button class="btn ghost" id="rideCancel">Not tonight</button></div>
+  </div>
+</section>
+
+<section id="rideResult" class="modal" hidden aria-labelledby="rrHead">
+  <div class="box">
+    <div class="eyebrow" id="rrLevel"></div>
+    <div class="bigtime" id="rrTime"></div>
+    <h2 id="rrHead"></h2>
+    <p id="rrMsg" style="margin:0;color:var(--muted)"></p>
+    <div class="fine" id="rrBest"></div>
+    <div class="row"><button class="btn" id="rideAgain">Ride again</button><button class="btn ghost" id="rideBack">Back to the museum</button></div>
+  </div>
+</section>
+
+<section id="pause" hidden>
+  <div class="box">
+    <div class="eyebrow">Paused</div>
+    <h2>Gothic Reading Room</h2>
+    <div class="fine" id="pauseCount"></div>
+    <div class="row">
+      <button class="btn" id="resume">Resume</button>
+      <button class="btn ghost" id="restart">Restart</button>
+    </div>
+    <div class="fine"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> walk · <kbd>Mouse</kbd> look · <kbd>E</kbd> explore · <kbd>M</kbd> mute</div>
+  </div>
+</section>
+
+<div id="fatal" hidden><p>This prototype needs WebGL, which this browser could not start. Try a current desktop version of Chrome, Edge, Firefox or Safari.</p></div>
+
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>
