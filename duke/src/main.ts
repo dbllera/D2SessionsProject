@@ -15,6 +15,12 @@ import { initScreens } from './screens';
 import { Sound } from './audio';
 import { game, player, setRoom } from './state';
 import { $ } from './util';
+import { updatePortalDoor } from './portalDoor';
+import { fadeIn, readArrival } from '../../shared/portal';
+
+/** Set when we came up the DKU atrium stair (see shared/portal.ts). */
+const arrival = readArrival();
+if (arrival) fadeIn();
 
 if (!renderer) {
   $('fatal').hidden = false;
@@ -45,6 +51,15 @@ function start() {
   initPanel();
   initScreens();
   initRide();
+  if (arrival === 'south-door') {
+    // We spawn at room.spawn anyway: just inside the south door, facing into the room.
+    document.querySelector('#start .eyebrow').textContent = 'Up the stairs from the DKU Library';
+    document.querySelector('#start h1').textContent = 'Welcome to Duke';
+    document.querySelector('#start .sub').textContent = 'Gothic Reading Room';
+    document.querySelector('#start p').textContent =
+      'You have come through the south door. Ten artifacts are waiting among the tables and bookcases. The same door takes you back to the DKU Library.';
+    $('enter').textContent = 'Click to continue';
+  }
 
   // ---------------------------------------------------------------- loop
   function resize() {
@@ -77,6 +92,7 @@ function start() {
     if (game.state !== 'paused') {
       room.update(time, dt);
       updateFocus(time, dt);
+      updatePortalDoor();
       // brighten slightly near the sunlit east windows
       const near = Math.max(0, Math.min(1, (camera.position.x + 3) / 7.5));
       expo += (0.96 + 0.16 * near - expo) * (1 - Math.exp(-1.5 * dt));
@@ -97,6 +113,7 @@ function start() {
     player,
     room,
     artifacts: ARTIFACTS,
+    arrival,
     renderer,
     blocked,
     teleport(x: number, z: number, yaw?: number, pitch?: number) {

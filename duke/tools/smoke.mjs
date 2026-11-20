@@ -2,13 +2,13 @@
 //   npm run dev            (in another terminal)
 //   npm run smoke          headless; screenshots in ./smoke-shots
 //   HEADED=1 npm run smoke watch it run
-//   URL=http://127.0.0.1:4173/ npm run smoke   test the production preview instead
+//   URL=http://127.0.0.1:4174/ npm run smoke   test the production preview instead
 import { chromium } from 'playwright-core';
 import { mkdirSync } from 'node:fs';
 
 const OUT = process.argv[2] || 'smoke-shots';
 mkdirSync(OUT, { recursive: true });
-const URL = process.env.URL || 'http://127.0.0.1:5173/';
+const URL = process.env.URL || 'http://127.0.0.1:5174/';
 
 const results = [];
 const check = (name, ok, detail = '') => {

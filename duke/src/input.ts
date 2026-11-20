@@ -7,6 +7,7 @@ import { useDragMode, requestLock } from './pointer';
 import { toast } from './hud';
 import { openPanel, closePanel } from './panel';
 import { pause } from './screens';
+import { useDoor } from './portalDoor';
 import { Ride, openRideMenu, closeRideMenu, startRide, throwRider, endRide } from './ride';
 
 var MOVE = {
@@ -75,7 +76,8 @@ export function initInput() {
     keys[e.code] = true;
     if (e.repeat) return;
     if (e.code === 'KeyE') {
-      if (game.state === 'playing' && game.focus) openPanel(game.focus);
+      if (game.state === 'playing' && game.door) useDoor();
+      else if (game.state === 'playing' && game.focus) openPanel(game.focus);
       else if (game.state === 'panel') closePanel();
     } else if (e.code === 'Escape') {
       if (game.state === 'panel') closePanel();

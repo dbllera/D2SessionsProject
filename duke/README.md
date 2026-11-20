@@ -2,7 +2,7 @@
 
 D2: The Half a Day Away Sessions is a dialogue incubator connecting Duke and Duke Kunshan University through a life-size audiovisual portal and an evolving 3D museum. Inspired by Shared Studios, the project explores how spatial design, sound, and guided conversation can create a sense of presence across distances without relying on expensive VR technology. Participants begin by exploring a virtual museum of artifacts from previous Duke-DKU encounters, selecting an object, memory, or question to initiate a live conversation through the portal. Following their discussion, participants collaboratively create an artifact that preserves the memories and perspectives/answers exchanged during their conversation. We will use this co-created product to expand a living archive, so future participants can revisit earlier dialogues, respond to previous answers, and build on the experiences of others. We will draw on concepts from somatic telepresence, second-order cybernetics, and distributed authorship to explore how dialogue can create an evolving memory between twelve-hour time zones
 
-This is the first-person **Gothic Reading Room** museum prototype, built with Three.js, TypeScript and Vite. It uses the same project layout as the `dku-library` branch.
+This is the first-person **Gothic Reading Room** museum prototype, built with Three.js, TypeScript and Vite. It is the **Duke world** of the connected project (see the root README): visitors arrive here from the DKU Library's atrium stair and leave through the south door. `src/portalDoor.ts` is the door; `../shared/portal.ts` is the travel contract.
 
 ## Run it
 
@@ -10,10 +10,10 @@ Requires Node 18+.
 
 ```bash
 npm install
-npm run dev          # → http://127.0.0.1:5173/
+npm run dev          # → http://127.0.0.1:5174/   (the DKU world uses 5173)
 ```
 
-Production build: `npm run build` (type-checks, then writes `dist/`), then `npm run preview` (→ http://127.0.0.1:4173/). `dist/` is static and can be hosted anywhere; asset paths are relative.
+Production build: `npm run build` (type-checks, then writes `dist/`), then `npm run preview` (→ http://127.0.0.1:4174/). The door back to DKU only works in the combined build (root `npm run build`). `dist/` is static and can be hosted anywhere; asset paths are relative.
 
 ## Controls
 

@@ -17,6 +17,8 @@ export interface GameState {
   /** Artifact whose panel is open. */
   open: Artifact | null;
   lastPrompt?: string | null;
+  /** True while the player is at the south door, facing it (portalDoor.ts). */
+  door?: boolean;
 }
 
 export const game: GameState = { state: 'start', lockMode: true, everLocked: false, found: 0, focus: null, open: null };
