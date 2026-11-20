@@ -1,6 +1,6 @@
 # DKU library reading room — first-person prototype
 
-This is the `dku-library` branch of [D2SessionsProject](https://github.com/dbllera/D2SessionsProject). The Gothic Reading Room remains on the repository's `main` branch.
+This is the **DKU world** of [D2SessionsProject](https://github.com/dbllera/D2SessionsProject) (see the root README). Visitors start here. The atrium stair behind the brass-handled lattice panel (`src/stairs.ts`) climbs to a doorway that leads to the Duke Gothic Reading Room; `../shared/portal.ts` is the travel contract.
 
 A walkable 3D reconstruction of the double-height reading room shown in the reference photos. It is built with real geometry and materials in Three.js, TypeScript and Vite. There is no score or quest; you explore and interact.
 
@@ -13,7 +13,7 @@ npm install
 npm run dev          # → http://127.0.0.1:5173/
 ```
 
-Production build: `npm run build`, then `npm run preview` (→ http://127.0.0.1:4173/).
+Production build: `npm run build`, then `npm run preview` (→ http://127.0.0.1:4173/). The stair doorway only reaches Duke in the combined build (root `npm run build`).
 
 Everything is local. There are no remote assets or runtime services, and all textures are either generated procedurally on a canvas or converted from the reference photos.
 

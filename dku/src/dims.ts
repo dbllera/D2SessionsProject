@@ -20,3 +20,7 @@ export const BULK_Y1 = 6.0;
 export const EYE = 1.65;
 export const PLAYER_R = 0.28;
 export const SPAWN = { x: 1.6, z: -7.3, yaw: Math.PI, pitch: -0.04 };
+/** Atrium volume beyond the corridor balustrade (simplified): lower floor y0, skylight y1. */
+export const ATRIUM = { x0: -12, x1: 12, z0: CORRIDOR_Z, z1: 26, y0: -4.5, y1: 14 };
+/** Half-width of the gap in the corridor balustrade where the atrium stair starts (stairs.ts). */
+export const STAIR_GAP_HALF = 0.9;

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import type { CollisionWorld } from './collision';
-import { BULK_Y0, BULK_Y1, CEIL, CORRIDOR_Z, SLAT_Y, X0, X1, Z0, Z1 } from './dims';
+import { ATRIUM, BULK_Y0, BULK_Y1, CEIL, CORRIDOR_Z, SLAT_Y, STAIR_GAP_HALF, X0, X1, Z0, Z1 } from './dims';
 import { box, merge, post } from './geo';
 import type { Materials } from './materials';
 
@@ -125,19 +125,27 @@ export function buildRoom(ctx: Ctx) {
   soffit.rotation.x = Math.PI / 2;
   soffit.position.set(0, BULK_Y0 - 0.001, (Z1 + CORRIDOR_Z) / 2);
   scene.add(soffit);
-  // glass balustrade with steel rail and posts
-  const bal = new THREE.Mesh(new THREE.PlaneGeometry(X1 - X0, 1.05), mats.glass);
-  bal.position.set(0, 0.55, CORRIDOR_Z);
-  bal.renderOrder = 2;
-  scene.add(bal);
-  const rail: THREE.BufferGeometry[] = [box(X1 - X0, 0.05, 0.06, 0, 1.1, CORRIDOR_Z)];
-  for (let x = X0 + 1; x < X1; x += 1.5) rail.push(box(0.04, 1.1, 0.04, x, 0.55, CORRIDOR_Z + 0.03));
+  // glass balustrade with steel rail and posts, open in the middle where the atrium stair starts
+  const G = STAIR_GAP_HALF;
+  const rail: THREE.BufferGeometry[] = [];
+  for (const [a, b] of [
+    [X0, -G],
+    [G, X1],
+  ]) {
+    const bal = new THREE.Mesh(new THREE.PlaneGeometry(b - a, 1.05), mats.glass);
+    bal.position.set((a + b) / 2, 0.55, CORRIDOR_Z);
+    bal.renderOrder = 2;
+    scene.add(bal);
+    rail.push(box(b - a, 0.05, 0.06, (a + b) / 2, 1.1, CORRIDOR_Z));
+  }
+  for (let x = X0 + 1; x < X1; x += 1.5) if (Math.abs(x) > G + 0.3) rail.push(box(0.04, 1.1, 0.04, x, 0.55, CORRIDOR_Z + 0.03));
+  for (const x of [-G, G]) rail.push(box(0.04, 1.1, 0.04, x, 0.55, CORRIDOR_Z + 0.03));
   scene.add(mesh(merge(rail), mats.steel, false, false));
   // floor edge of the corridor slab
   scene.add(mesh(box(X1 - X0 + 9, 0.5, 0.3, 0, -0.25, CORRIDOR_Z + 0.15), mats.atriumPlain, false, false));
 
-  // atrium volume (bright, simplified): walls, lower floor, gallery, wide wood stair seating
-  const A = { x0: -12, x1: 12, z0: CORRIDOR_Z, z1: 26, y0: -4.5, y1: 14 };
+  // atrium volume (bright, simplified): walls, lower floor, gallery. The stair itself is stairs.ts.
+  const A = ATRIUM;
   const atrium: THREE.BufferGeometry[] = [
     box(A.x1 - A.x0, 0.2, A.z1 - A.z0, 0, A.y0 - 0.1, (A.z0 + A.z1) / 2), // lower floor
     box(A.x1 - A.x0, A.y1 - A.y0, 0.2, 0, (A.y0 + A.y1) / 2, A.z1), // far wall
@@ -150,14 +158,6 @@ export function buildRoom(ctx: Ctx) {
   // lower-level side wall below the corridor slab
   atrium.push(box(A.x1 - A.x0, -A.y0, 0.2, 0, A.y0 / 2, CORRIDOR_Z + 0.2));
   scene.add(mesh(merge(atrium), mats.atrium, false, false));
-  const stairs: THREE.BufferGeometry[] = [];
-  const steps = 14;
-  for (let i = 0; i < steps; i++) {
-    const h = A.y0 + (i + 1) * ((BULK_Y1 - A.y0) / steps);
-    const z = 15 + i * 0.6;
-    stairs.push(box(8, h - A.y0, 0.6, 0, (h + A.y0) / 2, z));
-  }
-  scene.add(mesh(merge(stairs), mats.atriumWood, false, false));
   const galleryGlass = new THREE.Mesh(new THREE.PlaneGeometry(A.x1 - A.x0, 1.1), mats.glass);
   galleryGlass.position.set(0, BULK_Y1 + 0.55, Z1 + 4.3);
   galleryGlass.renderOrder = 2;
@@ -207,5 +207,6 @@ export function buildRoom(ctx: Ctx) {
   world.seg(X0, Z0, X0, CORRIDOR_Z, 0.02, 'wall-w');
   world.seg(X1, Z0, X1, CORRIDOR_Z, 0.02, 'wall-e');
   world.seg(X0, Z0, X1, Z0, 0.06, 'glass-n');
-  world.seg(X0, CORRIDOR_Z, X1, CORRIDOR_Z, 0.04, 'balustrade');
+  world.seg(X0, CORRIDOR_Z, -STAIR_GAP_HALF, CORRIDOR_Z, 0.04, 'balustrade');
+  world.seg(STAIR_GAP_HALF, CORRIDOR_Z, X1, CORRIDOR_Z, 0.04, 'balustrade');
 }

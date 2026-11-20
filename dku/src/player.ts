@@ -7,6 +7,14 @@ const WALK = 2.4; // m/s, natural walking pace
 const FAST = 4.0;
 const ACCEL = 10; // 1/s, exponential approach to target velocity
 const MAX_STEP = 0.08; // metres per collision sub-step (well under the player radius)
+const CLIMB = 14; // 1/s, how quickly the eye follows the floor height on stairs
+
+export interface PlayerOptions {
+  /** Floor height under (x, z); defaults to flat ground at y = 0. */
+  ground?: (x: number, z: number) => number;
+  /** Furthest +z the safety clamp allows (default: the corridor balustrade). */
+  zMax?: number;
+}
 
 export class Player {
   controls: PointerLockControls;
@@ -17,12 +25,19 @@ export class Player {
   forced: { ix: number; iz: number } | null = null;
   private keys = new Set<string>();
   private bob = 0;
+  /** Smoothed floor height under the player. */
+  private floorY = 0;
+  private ground: (x: number, z: number) => number;
+  private zMax: number;
 
   constructor(
     public camera: THREE.PerspectiveCamera,
     dom: HTMLElement,
     private world: CollisionWorld,
+    opts: PlayerOptions = {},
   ) {
+    this.ground = opts.ground ?? (() => 0);
+    this.zMax = opts.zMax ?? CORRIDOR_Z;
     this.controls = new PointerLockControls(camera, dom);
     this.controls.pointerSpeed = 0.9;
     camera.rotation.order = 'YXZ';
@@ -35,16 +50,23 @@ export class Player {
   reset() {
     this.pos.set(SPAWN.x, SPAWN.z);
     this.vel.set(0, 0);
+    this.floorY = this.ground(SPAWN.x, SPAWN.z);
     this.camera.rotation.set(SPAWN.pitch, SPAWN.yaw, 0, 'YXZ');
-    this.camera.position.set(SPAWN.x, EYE, SPAWN.z);
+    this.camera.position.set(SPAWN.x, EYE + this.floorY, SPAWN.z);
   }
 
   setPose(x: number, z: number, yaw: number, pitch = 0) {
     const r = this.world.resolve(x, z, PLAYER_R, 8);
     this.pos.set(r.x, r.z);
     this.vel.set(0, 0);
+    this.floorY = this.ground(r.x, r.z);
     this.camera.rotation.set(pitch, yaw, 0, 'YXZ');
-    this.camera.position.set(r.x, EYE, r.z);
+    this.camera.position.set(r.x, EYE + this.floorY, r.z);
+  }
+
+  /** Height of the floor under the player (smoothed), e.g. 6 on the atrium gallery landing. */
+  get floor() {
+    return this.floorY;
   }
 
   get yaw() {
@@ -100,9 +122,9 @@ export class Player {
       x = r.x;
       z = r.z;
     }
-    // hard safety clamp: never leave the room + corridor envelope
+    // hard safety clamp: never leave the room + corridor (+ atrium stair) envelope
     x = THREE.MathUtils.clamp(x, X0 + PLAYER_R, X1 - PLAYER_R);
-    z = THREE.MathUtils.clamp(z, Z0 + PLAYER_R, CORRIDOR_Z - PLAYER_R);
+    z = THREE.MathUtils.clamp(z, Z0 + PLAYER_R, this.zMax - PLAYER_R);
     if (!Number.isFinite(x) || !Number.isFinite(z)) {
       this.reset();
       return;
@@ -112,6 +134,7 @@ export class Player {
     // subtle head bob scaled by actual ground speed
     this.bob += moved * 7.5;
     const sp = Math.min(1, moved / Math.max(dt, 1e-4) / WALK);
-    this.camera.position.set(x, EYE + Math.sin(this.bob) * 0.012 * sp, z);
+    this.floorY += (this.ground(x, z) - this.floorY) * (1 - Math.exp(-CLIMB * dt));
+    this.camera.position.set(x, EYE + this.floorY + Math.sin(this.bob) * 0.012 * sp, z);
   }
 }

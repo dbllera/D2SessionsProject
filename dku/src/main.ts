@@ -14,12 +14,17 @@ import { Pendants } from './pendants';
 import { Player } from './player';
 import { buildRoom, type Ctx } from './room';
 import { ShelfWall } from './shelf';
+import { AtriumStair } from './stairs';
+import { fadeIn, isTraveling, readArrival, travel } from '../../shared/portal';
 import './style.css';
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const params = new URLSearchParams(location.search);
 const debug = params.has('debug');
 const num = (k: string, d: number) => (params.has(k) ? Number(params.get(k)) : d);
+/** Set when we came down from the Duke world (see shared/portal.ts). */
+const arrival = readArrival();
+if (arrival) fadeIn();
 
 // ---------------------------------------------------------------- renderer
 const app = $('app');
@@ -57,6 +62,7 @@ spine.anisotropy = 8;
 const shelf = new ShelfWall(ctx, spine);
 const lattice = new LatticeScreens(ctx);
 const pendants = new Pendants(ctx);
+const stair = new AtriumStair(ctx);
 buildFurniture(ctx);
 
 // ---------------------------------------------------------------- lighting
@@ -100,7 +106,18 @@ if (num('bloom', 1) > 0) composer.addPass(bloom);
 composer.addPass(new OutputPass());
 
 // ---------------------------------------------------------------- player
-const player = new Player(camera, renderer.domElement, world);
+const player = new Player(camera, renderer.domElement, world, {
+  ground: (x, z) => stair.heightAt(x, z),
+  zMax: stair.zMax,
+});
+if (arrival === 'stairs-top') {
+  const a = stair.topArrival;
+  player.setPose(a.x, a.z, a.yaw, a.pitch);
+  // Coming back through the lattice needs it open.
+  lattice.toggle(99, 99);
+  lattice.update(10); // jump straight to fully open
+  renderer.shadowMap.needsUpdate = true;
+}
 
 // ---------------------------------------------------------------- UI
 const overlay = $('overlay');
@@ -110,6 +127,12 @@ const toastEl = $('toast');
 const inspect = $('inspect');
 const fpsEl = $('fps');
 if (debug) fpsEl.hidden = false;
+if (arrival === 'stairs-top') {
+  $('overlay-eyebrow').textContent = 'Back from Duke';
+  $('overlay-title').textContent = 'DKU Library';
+  $('overlay-lede').textContent = 'You came down the atrium stair from the Gothic Reading Room. The library is ahead, through the open lattice panel.';
+  $('start-label').textContent = 'Click to continue';
+}
 
 let toastTimer = 0;
 function toast(msg: string) {
@@ -272,6 +295,9 @@ function adaptResolution(fps: number) {
   }
 }
 
+/** The doorway only fires after the player has stood outside it (so arriving never re-triggers). */
+let doorwayArmed = false;
+let wasInApproach = false;
 const clock = new THREE.Clock();
 let fpsAcc = 0;
 let fpsFrames = 0;
@@ -282,6 +308,19 @@ function frame() {
   if (lattice.update(dt)) renderer.shadowMap.needsUpdate = true;
   shelf.update(dt);
   pendants.update(dt);
+
+  // ---- portal: the doorway at the top of the atrium stair leads to Duke
+  const px = player.pos.x;
+  const pz = player.pos.y;
+  if (stair.isAtDoorway(px, pz)) {
+    if (doorwayArmed && player.controls.isLocked && !isTraveling()) {
+      player.frozen = true;
+      travel('duke', 'south-door');
+    }
+  } else doorwayArmed = true;
+  const inApproach = stair.inApproach(px, pz);
+  if (inApproach && !wasInApproach && player.controls.isLocked) toast('Stairs up to Duke · Gothic Reading Room');
+  wasInApproach = inApproach;
 
   current = player.controls.isLocked && inspecting === null ? aim() : null;
   if (current) {
@@ -328,6 +367,9 @@ window.__lib = {
       pendantsOn: pendants.list.map((p) => p.on),
       latticeOpen: lattice.open,
       latticeAmount: lattice.openAmount,
+      floor: player.floor,
+      arrival,
+      traveling: isTraveling(),
       fps: lastFps,
       draws: renderer.info.render.calls,
       pixelRatio: renderer.getPixelRatio(),
@@ -349,4 +391,5 @@ window.__lib = {
     return d;
   },
   ceil: CEIL,
+  stairTop: stair.topArrival,
 };

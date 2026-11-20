@@ -211,9 +211,16 @@ await wait(1500);
 await hold('w', 2200);
 s = await st();
 check('can walk through the opened panel into the corridor', s.z > 9.2, `z=${s.z.toFixed(2)}`);
+// the balustrade is open in the middle (x within ±0.9) where the atrium stair starts; test beside the gap
+await pose(2.5, 10.4, Math.PI, 0);
 await hold('w', 2000);
 s = await st();
 check('balustrade blocks at the corridor edge', s.z <= 11.2 - 0.27, `z=${s.z.toFixed(3)}`);
+await pose(0, 10.4, Math.PI, 0);
+await hold('w', 1500);
+s = await st();
+check('stair gap in the balustrade lets you onto the flight', s.z > 11.4 && s.floor > 0.1, `z=${s.z.toFixed(2)} floor=${s.floor.toFixed(2)}`);
+await pose(0.6, 10.6, Math.PI, 0);
 await shot('07-corridor');
 // try to close while standing in the swing arc: must refuse
 await pose(piv.x + 0.45, 9.3, Math.PI / 2, -0.1);
