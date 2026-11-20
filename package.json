@@ -1,0 +1,20 @@
+{
+  "name": "d2-connected-worlds",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "DKU Library and Duke Gothic Reading Room, connected by the atrium stair and the south door.",
+  "scripts": {
+    "setup": "npm ci && npm ci --prefix dku && npm ci --prefix duke",
+    "dev": "concurrently -k -n dku,duke -c cyan,magenta \"npm run dev --prefix dku\" \"npm run dev --prefix duke\"",
+    "build": "npm run build --prefix dku -- --outDir ../dist --emptyOutDir && npm run build --prefix duke -- --outDir ../dist/duke --emptyOutDir",
+    "preview": "npm run preview --prefix dku -- --outDir ../dist",
+    "typecheck": "npm run typecheck --prefix dku && npm run typecheck --prefix duke",
+    "smoke": "npm run smoke --prefix dku && npm run smoke --prefix duke && node tools/smoke-portal.mjs",
+    "smoke:portal": "node tools/smoke-portal.mjs"
+  },
+  "devDependencies": {
+    "concurrently": "9.1.2",
+    "playwright-core": "1.49.1"
+  }
+}

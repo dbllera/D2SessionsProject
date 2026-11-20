@@ -1,0 +1,9 @@
+# Each world has its own owner, so DKU and Duke work never touch the same files.
+# Replace the placeholders with real GitHub usernames or teams.
+/dku/              @DKU_ENGINEER
+/duke/             @DUKE_ENGINEER
+# The travel contract and root scaffolding are shared: changes need both.
+/shared/           @DKU_ENGINEER @DUKE_ENGINEER
+/tools/            @DKU_ENGINEER @DUKE_ENGINEER
+/package.json      @DKU_ENGINEER @DUKE_ENGINEER
+/README.md         @DKU_ENGINEER @DUKE_ENGINEER
