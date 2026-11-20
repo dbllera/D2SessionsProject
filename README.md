@@ -59,11 +59,6 @@ npm run smoke:portal   # just DKU → Duke → DKU (HEADED=1 to watch)
 DKU_URL=http://127.0.0.1:4173/ DUKE_URL=http://127.0.0.1:4173/duke/ npm run smoke:portal   # against `npm run preview`
 ```
 
-## Pulling in work from the old branches
+## History
 
-`dku/` and `duke/` were imported with their history from `dku-library` and `gothic-modular`. Later commits on those branches can still be merged:
-
-```bash
-git merge -X subtree=dku/  origin/dku-library
-git merge -X subtree=duke/ origin/gothic-modular
-```
+`dku/` and `duke/` were imported, with their full history, from the former `dku-library` and `gothic-modular` branches (`gothic-modular` was itself built from the single-file `duke` branch). Those branches have been retired; everything they contained is in this branch's history (`git log -- dku/` or `git log -- duke/`).
