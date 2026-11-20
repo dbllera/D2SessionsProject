@@ -26,7 +26,7 @@ function veil(opaque: boolean): HTMLDivElement {
     el.id = 'd2-portal-veil';
     el.setAttribute('aria-hidden', 'true');
     el.style.cssText =
-      'position:fixed;inset:0;background:#000;z-index:2147483647;pointer-events:none;' +
+      'position:fixed;inset:0;background:#000;z-index:2147483647;pointer-events:none;visibility:visible;' +
       `transition:opacity ${FADE_MS}ms ease;opacity:${opaque ? 1 : 0}`;
     document.body.appendChild(el);
   }
@@ -69,6 +69,15 @@ export function readArrival(): Arrival | null {
     location.pathname + (q ? '?' + q.replace(/=(&|$)/g, '$1') : '') + location.hash,
   );
   return (ARRIVALS as readonly string[]).includes(a) ? (a as Arrival) : null;
+}
+
+/**
+ * Show the page. Each index.html hides <body> (and keeps the background black) until this runs,
+ * so the raw, unstyled HTML never flashes while a world is loading. Call after the world's CSS
+ * is imported and, on arrival, after fadeIn() so the black veil is already in place.
+ */
+export function revealPage(): void {
+  document.documentElement.classList.add('d2-ready');
 }
 
 /** Start opaque and fade the page in. Call once on arrival. */

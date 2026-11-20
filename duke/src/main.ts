@@ -16,11 +16,12 @@ import { Sound } from './audio';
 import { game, player, setRoom } from './state';
 import { $ } from './util';
 import { updatePortalDoor } from './portalDoor';
-import { fadeIn, readArrival } from '../../shared/portal';
+import { fadeIn, readArrival, revealPage } from '../../shared/portal';
 
 /** Set when we came up the DKU atrium stair (see shared/portal.ts). */
 const arrival = readArrival();
 if (arrival) fadeIn();
+revealPage();
 
 if (!renderer) {
   $('fatal').hidden = false;

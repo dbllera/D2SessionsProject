@@ -15,7 +15,7 @@ import { Player } from './player';
 import { buildRoom, type Ctx } from './room';
 import { ShelfWall } from './shelf';
 import { AtriumStair } from './stairs';
-import { fadeIn, isTraveling, readArrival, travel } from '../../shared/portal';
+import { fadeIn, isTraveling, readArrival, revealPage, travel } from '../../shared/portal';
 import './style.css';
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -25,6 +25,7 @@ const num = (k: string, d: number) => (params.has(k) ? Number(params.get(k)) : d
 /** Set when we came down from the Duke world (see shared/portal.ts). */
 const arrival = readArrival();
 if (arrival) fadeIn();
+revealPage();
 
 // ---------------------------------------------------------------- renderer
 const app = $('app');
